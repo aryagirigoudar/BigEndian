@@ -1,0 +1,125 @@
+Overview
+This project implements a file transfer system with integrity verification using a client-server model. The code is written in Python and leverages TCP sockets for communication. The program ensures file transfer reliability by splitting files into chunks, using sequence numbers, and verifying file integrity with checksums.
+
+Server Code Breakdown
+1. Server Initialization
+- The server is initialized using TCP sockets.
+- It listens for incoming connections on a specified port.
+
+2. Handling Client Connections
+- Upon receiving a connection, the server accepts the client and processes the incoming file data.
+
+3. Chunk-based File Transfer
+- The server receives the file name and total number of chunks from the client.
+- The incoming data is processed chunk by chunk.
+- Each chunk is identified by a unique sequence number to maintain correct order.
+
+4. Retransmission Mechanism
+- If the retransmission option (RETRANSMIT) is enabled, the server simulates lost packets by randomly requesting retransmissions.
+- When a retransmission is requested, the server waits for the client to resend the missing chunk.
+
+5. Checksum Verification
+- After all chunks are received, the server calculates the SHA256 checksum for the file.
+- It compares this checksum with the one sent by the client to verify integrity.
+
+6. Error Handling and Cleanup
+- The server includes error handling to manage connection errors and unexpected terminations.
+- It closes the connection and socket after the transfer completes.
+
+Client Code Breakdown
+
+1. Client Initialization
+- The client establishes a connection to the server using TCP sockets.
+- It sends initial information such as user identification and operation mode (send/receive).
+
+2. File Splitting and Transmission
+- When sending a file, the client reads the file and splits it into fixed-size chunks (default: 1024 bytes).
+- Each chunk is prefixed with a sequence number for ordering.
+- The client sends the chunks sequentially to the server.
+
+3. Handling Acknowledgments and Retransmissions
+- For each chunk sent, the client waits for an acknowledgment (ACK <sequence number>) from the server.
+- If the server requests a retransmission (RE <sequence number>), the client resends the specified chunk.
+
+4. Checksum Calculation and Transmission
+- The client computes the checksum using SHA256 before sending the file.
+- After all chunks are sent, the client transmits the checksum to the server.
+
+5. Receiving Files
+- In receive mode, the client downloads the file in chunks from the server.
+- It reassembles the file in the correct order and verifies its integrity by recalculating the checksum.
+
+Code Features
+
+1. Chunk-based File Transfer
+- The file is divided into smaller chunks to improve reliability and handle retransmissions.
+
+2. TCP Sockets for Reliable Communication
+- The code uses TCP sockets to ensure reliable, ordered data transmission.
+
+3. Sequence Numbering for Ordering
+- Each chunk is tagged with a sequence number to maintain proper order during reassembly.
+
+4. Retransmission Mechanism
+- The system simulates potential network errors and handles retransmissions for missing or corrupted chunks.
+
+5. Checksum Verification
+- The integrity of the file is verified using SHA256 checksum comparison between client and server.
+
+6. Cross-Platform Compatibility
+- The system can run on any operating system that supports Python and TCP sockets.
+
+Key Code Functions
+
+Server Code Functions:
+- server(): Initializes the server, listens for clients, handles file reception, and verifies integrity.
+- calculate_checksum(file_path): Computes the SHA256 checksum for a given file.
+
+Client Code Functions:
+- client(): Establishes a connection with the server, sends/receives files, and handles retransmissions.
+- calculate_checksum(file_path): Computes the checksum before or after transfer to verify data integrity.
+
+
+
+Networking and Communication Protocol
+- TCP Communication: The client and server communicate using reliable TCP connections.
+- Message Formats:
+  - Acknowledgments: ACK <sequence number>
+  - Retransmissions: RE <sequence number>
+  - File and chunk data are sent in a structured format with sequence numbers.
+
+Error Simulation
+- The server includes an optional retransmission mode (RETRANSMIT) to simulate network packet loss.
+- Random retransmission requests are generated to test the system’s robustness.
+
+Code Structure and Flow
+
+Client-Side Flow:
+1. Establish connection to the server.
+2. Send user and file information.
+3. Split file into chunks and send sequentially.
+4. Handle acknowledgments and retransmissions.
+5. Send checksum for verification.
+
+Server-Side Flow:
+1. Accept client connection.
+2. Receive file and chunk details.
+3. Process chunks with sequence numbers.
+4. Request retransmissions if necessary.
+5. Calculate and compare checksum for integrity.
+
+
+Customization Options
+- Chunk Size: Change the default chunk size (1024 bytes) to optimize for different network conditions.
+- Error Simulation: Enable or disable the retransmission mechanism using the RETRANSMIT flag.
+
+
+Scalability and Future Improvements
+- Concurrent Client Support: Implement multi-threading to handle multiple clients simultaneously.
+- Encryption: Add encryption to secure file transfers.
+- Dynamic Chunk Size: Adjust chunk size dynamically based on network performance.
+- Timeout and Retry Logic: Handle dropped connections with retries and timeouts.
+
+
+Conclusion
+This code provides a robust foundation for a file transfer system with error handling and integrity verification. It can be extended and scaled to support secure, reliable file sharing in larger distributed networks.
